@@ -1,4 +1,5 @@
 import type { IRequestContext, ThanhHoa } from '@thanhhoajs/thanhhoa';
+import { UserRefreshTokenGuard } from 'src/common/middlewares/user-refresh-token-guard.middleware';
 
 import { SessionService } from '../session/session.service';
 import { UserService } from '../user/user.service';
@@ -20,6 +21,7 @@ export class AuthModule {
       sessionService,
     );
     const authController = new AuthController(authService);
+    const guard = new UserRefreshTokenGuard(jwtService);
 
     app.post('/auth/login', (context: IRequestContext) =>
       authController.login(context),
@@ -27,6 +29,14 @@ export class AuthModule {
 
     app.post('/auth/register', (context: IRequestContext) =>
       authController.register(context),
+    );
+
+    app.get('/auth/logout', guard.check, (context: IRequestContext) =>
+      authController.logout(context),
+    );
+
+    app.get('/auth/refresh-token', guard.check, (context: IRequestContext) =>
+      authController.refreshToken(context),
     );
   }
 }

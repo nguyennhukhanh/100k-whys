@@ -14,11 +14,12 @@ export class AuthService {
     private readonly sessionService: SessionService,
   ) {}
 
-  async register(dto: CreateUserDto) {
+  async register({ fullName, email, password }: CreateUserDto) {
     try {
-      const hashedPassword = await this.hashService.hash(dto.password);
+      const hashedPassword = await this.hashService.hash(password);
       const user = await this.userService.createUser({
-        ...dto,
+        fullName,
+        email,
         password: hashedPassword,
       });
 

@@ -3,8 +3,6 @@ import { eq } from 'drizzle-orm';
 import { db } from 'src/database/db';
 import { users } from 'src/database/schemas/users.schema';
 
-import type { CreateUserDto } from '../auth/dto/user.create';
-
 export class UserService {
   async getUserByEmail(email: string) {
     const result = await db
@@ -15,7 +13,7 @@ export class UserService {
     return result[0];
   }
 
-  async createUser(dto: CreateUserDto): Promise<any> {
+  async createUser(dto: { email: string; fullName: string; password: string }) {
     try {
       const userExist = await this.getUserByEmail(dto.email);
       if (userExist) {

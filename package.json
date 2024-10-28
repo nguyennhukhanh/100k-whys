@@ -19,7 +19,6 @@
     "@thanhhoajs/logger": "latest",
     "@thanhhoajs/thanhhoa": "latest",
     "@thanhhoajs/validator": "latest",
-    "argon2": "^0.41.1",
     "drizzle-orm": "^0.35.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",

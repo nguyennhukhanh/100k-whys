@@ -6,7 +6,7 @@ import {
 import { userAuthConfig } from 'src/configs/user-auth.config';
 import type { JwtService } from 'src/modules/auth/jwt.service';
 
-export class UserGuard {
+export class UserRefreshTokenGuard {
   constructor(private readonly jwrService: JwtService) {}
 
   check: Middleware = async (

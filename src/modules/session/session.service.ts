@@ -1,5 +1,6 @@
 import { HttpException } from '@thanhhoajs/thanhhoa';
 import { eq, sql } from 'drizzle-orm';
+import { userAuthConfig } from 'src/configs/user-auth.config';
 import { db } from 'src/database/db';
 import { userSessions } from 'src/database/schemas/user-sessions.schema';
 import { users } from 'src/database/schemas/users.schema';
@@ -33,6 +34,9 @@ export class SessionService {
     const newSession = {
       id: uuidv4(),
       userId,
+      expiresAt: new Date(
+        Date.now() + Number(userAuthConfig.refreshTokenLifetime) * 1000,
+      ),
       createdAt: new Date(),
       updatedAt: new Date(),
     };

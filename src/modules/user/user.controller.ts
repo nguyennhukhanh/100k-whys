@@ -68,13 +68,6 @@ export class UserController {
    *                     message:
    *                       type: string
    *                       example: Not found
-   * components:
-   *   securitySchemes:
-   *     bearerAuth:
-   *       type: http
-   *       scheme: bearer
-   *       bearerFormat: JWT
-   *       description: Enter JWT token
    */
   async getProfile(context: IRequestContext): Promise<Response> {
     const user = context.user;
