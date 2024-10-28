@@ -10,6 +10,10 @@ RUN bun install --frozen-lockfile && bun build
 FROM base AS runner
 WORKDIR /app
 
+# Preparing database
+RUN bun db:generate
+RUN bun db:migrate
+
 # Creating user and setting permissions
 RUN addgroup --system --gid 1001 bun && \
     adduser --system --uid 1001 thanhhoajs
