@@ -3,11 +3,8 @@ import { createValidator } from '@thanhhoajs/validator';
 const adminAuthValidator = createValidator();
 
 adminAuthValidator.field('accessTokenSecret').required().string();
-
 adminAuthValidator.field('accessTokenLifetime').required().number();
-
 adminAuthValidator.field('refreshTokenSecret').required().string();
-
 adminAuthValidator.field('refreshTokenLifetime').required().number();
 
 const adminAuthConfig = {

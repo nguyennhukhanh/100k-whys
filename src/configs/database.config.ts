@@ -3,19 +3,12 @@ import { createValidator } from '@thanhhoajs/validator';
 const dbValidator = createValidator();
 
 dbValidator.field('type').required().string();
-
 dbValidator.field('host').required().string();
-
 dbValidator.field('port').required().number();
-
 dbValidator.field('username').required().string();
-
 dbValidator.field('password').required().string();
-
 dbValidator.field('database').required().string();
-
 dbValidator.field('synchronize').required().boolean();
-
 dbValidator.field('debug').required().boolean();
 
 const dbConfig = {

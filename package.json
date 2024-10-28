@@ -20,6 +20,7 @@
     "@thanhhoajs/thanhhoa": "latest",
     "@thanhhoajs/validator": "latest",
     "drizzle-orm": "^0.35.3",
+    "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
     "swagger-jsdoc": "^6.2.8",

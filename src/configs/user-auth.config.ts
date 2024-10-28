@@ -3,11 +3,8 @@ import { createValidator } from '@thanhhoajs/validator';
 const userAuthValidator = createValidator();
 
 userAuthValidator.field('accessTokenSecret').required().string();
-
 userAuthValidator.field('accessTokenLifetime').required().number();
-
 userAuthValidator.field('refreshTokenSecret').required().string();
-
 userAuthValidator.field('refreshTokenLifetime').required().number();
 
 const userAuthConfig = {

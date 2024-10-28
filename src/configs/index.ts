@@ -3,9 +3,10 @@ import { Logger } from '@thanhhoajs/logger';
 import { adminAuthConfig, adminAuthValidator } from './admin-auth.config';
 import { appConfig, appValidator } from './app.config';
 import { dbConfig, dbValidator } from './database.config';
+import { redisConfig, redisValidator } from './redis.config';
 import { userAuthConfig, userAuthValidator } from './user-auth.config';
 
-const logger = Logger.get('CONFIGS');
+const logger = Logger.get('Configs');
 
 export const runValidators = async () => {
   try {
@@ -14,6 +15,7 @@ export const runValidators = async () => {
       appValidator.validate(appConfig),
       userAuthValidator.validate(userAuthConfig),
       adminAuthValidator.validate(adminAuthConfig),
+      redisValidator.validate(redisConfig),
     ]);
 
     const allErrors = results.filter((errors) => errors.length > 0);
@@ -21,7 +23,6 @@ export const runValidators = async () => {
     if (allErrors.length > 0) {
       logger.error('Validation errors:');
       logger.trace(allErrors);
-      process.exit(1);
     } else {
       logger.success('All configurations are valid!');
     }
