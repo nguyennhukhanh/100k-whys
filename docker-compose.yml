@@ -1,8 +1,7 @@
-version: '3'
 services:
   backend:
     user: root
-    container_name: backend
+    container_name: backend_whys
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,19 +18,19 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis
+    container_name: redis_whys
     environment:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_NAME=${REDIS_NAME}
     ports:
-      - '${REDIS_PORT}:${REDIS_PORT}'
+      - 6378:${REDIS_PORT}
     volumes:
       - redis-data:/data
 
   mysql_db:
     image: mysql:8.0.25
-    container_name: mysql
+    container_name: mysql_whys
     restart: unless-stopped
     command:
       - --sort_buffer_size=1073741824

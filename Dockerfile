@@ -1,26 +1,27 @@
 FROM oven/bun:1 AS base
-RUN apk update && apk add --no-cache libc6-compat && corepack enable
+
+# Install Node.js and enable corepack
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    corepack enable
 
 # Install dependencies and build
 WORKDIR /app
 COPY . .
-RUN bun install --frozen-lockfile && bun build
+RUN bun install
 
 # Runtime stage
 FROM base AS runner
 WORKDIR /app
 
-# Preparing database
-RUN bun db:generate
-RUN bun db:migrate
+# Creating user and setting permissions with existence check
+RUN groupadd -r -g 1001 bun || true && \
+    id -u thanhhoajs &>/dev/null || useradd -r -u 1001 -g bun thanhhoajs
 
-# Creating user and setting permissions
-RUN addgroup --system --gid 1001 bun && \
-    adduser --system --uid 1001 thanhhoajs
 USER thanhhoajs
-
 COPY --from=base /app /app
-
 EXPOSE 1234
 ENV PORT=1234
 CMD ["bun", "prod"]
