@@ -139,6 +139,7 @@ export class SessionService {
         id: admins.id,
         email: admins.email,
         fullName: admins.fullName,
+        role: admins.role,
         createdAt: admins.createdAt,
         updatedAt: admins.updatedAt,
       })

@@ -26,7 +26,7 @@ export class UserRefreshTokenGuard {
       context.user = user;
       return next();
     } catch (error) {
-      throw new HttpException('Invalid token', 401);
+      throw error;
     }
   };
 }

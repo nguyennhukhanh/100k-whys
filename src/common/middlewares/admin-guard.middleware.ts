@@ -23,7 +23,7 @@ export class AdminGuard {
       context.admin = admin;
       return next();
     } catch (error) {
-      throw new HttpException('Invalid token', 401);
+      throw error;
     }
   };
 }

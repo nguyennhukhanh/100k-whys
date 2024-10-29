@@ -1,15 +1,15 @@
 import type { IRequestContext, ThanhHoa } from '@thanhhoajs/thanhhoa';
-import { AdminGuard } from 'src/common/middlewares/admin-guard.middleware';
 import { AdminRefreshTokenGuard } from 'src/common/middlewares/admin-refresh-token-guard.middleware';
 import { UserRefreshTokenGuard } from 'src/common/middlewares/user-refresh-token-guard.middleware';
+import { RoleEnum } from 'src/shared/enums';
 
 import { AdminService } from '../admin/admin.service';
-import { SessionService } from '../session/session.service';
+import { GUARD, ROLE_GUARD } from '../services/guard.service';
+import { jwtService, sessionService } from '../services/shared.service';
 import { UserService } from '../user/user.service';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthService } from './admin-auth.service';
 import { HashService } from './hash.service';
-import { JwtService } from './jwt.service';
 import { UserAuthController } from './user-auth.controller';
 import { UserAuthService } from './user-auth.service';
 
@@ -17,9 +17,7 @@ export class AuthModule {
   constructor(app: ThanhHoa) {
     const userService = new UserService();
     const adminService = new AdminService();
-    const sessionService = new SessionService();
     const hashService = new HashService();
-    const jwtService = new JwtService(sessionService);
     const userAuthService = new UserAuthService(
       userService,
       hashService,
@@ -35,7 +33,6 @@ export class AuthModule {
     const userAuthController = new UserAuthController(userAuthService);
     const adminAuthController = new AdminAuthController(adminAuthService);
     const userRefreshTokenGuard = new UserRefreshTokenGuard(jwtService);
-    const adminGuard = new AdminGuard(jwtService);
     const adminRefreshTokenGuard = new AdminRefreshTokenGuard(jwtService);
 
     app.group('/user', (app) => {
@@ -65,8 +62,11 @@ export class AuthModule {
         adminAuthController.login(context),
       );
 
-      app.post('/auth/register', adminGuard.check, (context: IRequestContext) =>
-        adminAuthController.register(context),
+      app.post(
+        '/auth/register',
+        GUARD(RoleEnum.ADMIN),
+        ROLE_GUARD(RoleEnum.SUPER_ADMIN),
+        (context: IRequestContext) => adminAuthController.register(context),
       );
 
       app.get(

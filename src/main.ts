@@ -59,6 +59,7 @@ app.use(
     library: 'zlib',
     memLevel: 9,
     windowBits: 9,
+    strategy: 0,
   }),
 );
 
