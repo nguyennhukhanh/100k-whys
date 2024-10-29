@@ -1,8 +1,11 @@
 import {
+  cacheMiddleware,
+  compression,
   corsMiddleware,
   helmetMiddleware,
   type INextFunction,
   type IRequestContext,
+  rateLimiter,
   setupSwagger,
   ThanhHoa,
 } from '@thanhhoajs/thanhhoa';
@@ -39,6 +42,24 @@ app.use((context, next) =>
 );
 app.use((context, next) =>
   applyMiddlewareIfNeeded(helmetMiddleware, context, next),
+);
+app.use(
+  rateLimiter({
+    windowMs: 30000, // 30 seconds
+    maxRequests: 5, // 5 requests
+    message: 'Too many requests, please try again later',
+    skipFailedRequests: false,
+    skipSuccessfulRequests: false,
+  }),
+);
+app.use(cacheMiddleware());
+app.use(
+  compression({
+    level: 1,
+    library: 'zlib',
+    memLevel: 9,
+    windowBits: 9,
+  }),
 );
 
 setupSwagger(app, docsRoute, swaggerSpec);

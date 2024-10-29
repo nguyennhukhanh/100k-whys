@@ -4,8 +4,8 @@ export enum SortEnum {
 }
 
 export enum RoleEnum {
-  SUPER_ADMIN = 'super_admin',
-  ADMIN = 'admin',
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
 }
 
 export enum SocialAuthEnum {

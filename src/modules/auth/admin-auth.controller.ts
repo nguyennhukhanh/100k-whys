@@ -1,21 +1,23 @@
 import type { IRequestContext } from '@thanhhoajs/thanhhoa';
 
-import type { AuthService } from './auth.service';
+import type { AdminAuthService } from './admin-auth.service';
 import { CreateUserDto } from './dto/user.create';
 import { ValidateUserDto } from './dto/user.validate';
 
-export class AuthController {
-  constructor(private authService: AuthService) {}
+export class AdminAuthController {
+  constructor(private adminAuthService: AdminAuthService) {}
 
   /**
    * @swagger
    * paths:
-   *   /api/auth/register:
+   *   /api/admin/auth/register:
    *     post:
    *       tags:
    *         - auth
+   *       security:
+   *         - bearerAuth: []
    *       summary: Register
-   *       description: Register
+   *       description: Grant an account to a new admin
    *       requestBody:
    *         required: true
    *         content:
@@ -26,7 +28,7 @@ export class AuthController {
    *                 email:
    *                   type: string
    *                   format: email
-   *                   default: user@example.com
+   *                   default: admin@example.com
    *                 password:
    *                   type: string
    *                   default: 123456
@@ -45,7 +47,7 @@ export class AuthController {
    *               schema:
    *                 type: object
    *                 properties:
-   *                   user:
+   *                   admin:
    *                     type: object
    *                     properties:
    *                       id:
@@ -85,9 +87,9 @@ export class AuthController {
       const { email, password, fullName } = await context.request.json();
       const dto = new CreateUserDto(email, fullName, password);
 
-      const user = await this.authService.register(dto);
+      const admin = await this.adminAuthService.register(context, dto);
 
-      return new Response(JSON.stringify(user), {
+      return new Response(JSON.stringify(admin), {
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (error) {
@@ -98,7 +100,7 @@ export class AuthController {
   /**
    * @swagger
    * paths:
-   *   /api/auth/login:
+   *   /api/admin/auth/login:
    *     post:
    *       tags:
    *         - auth
@@ -114,7 +116,7 @@ export class AuthController {
    *                 email:
    *                   type: string
    *                   format: email
-   *                   default: user@example.com
+   *                   default: admin@example.com
    *                 password:
    *                   type: string
    *                   default: 123456
@@ -130,7 +132,7 @@ export class AuthController {
    *               schema:
    *                 type: object
    *                 properties:
-   *                   user:
+   *                   admin:
    *                     type: object
    *                     properties:
    *                       id:
@@ -174,9 +176,9 @@ export class AuthController {
       const { email, password } = await context.request.json();
       new ValidateUserDto(email, password);
 
-      const user = await this.authService.login(email, password);
+      const admin = await this.adminAuthService.login(email, password);
 
-      return new Response(JSON.stringify(user), {
+      return new Response(JSON.stringify(admin), {
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (error) {
@@ -187,7 +189,7 @@ export class AuthController {
   /**
    * @swagger
    * paths:
-   *   /api/auth/logout:
+   *   /api/admin/auth/logout:
    *     get:
    *       security:
    *         - bearerAuth: []
@@ -225,7 +227,7 @@ export class AuthController {
    */
   async logout(context: IRequestContext): Promise<Response> {
     try {
-      const isLogout = await this.authService.logout(context);
+      const isLogout = await this.adminAuthService.logout(context);
       return new Response(JSON.stringify({ isLogout }), {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -237,7 +239,7 @@ export class AuthController {
   /**
    * @swagger
    * paths:
-   *   /api/auth/refresh-token:
+   *   /api/admin/auth/refresh-token:
    *     get:
    *       security:
    *         - bearerAuth: []
@@ -253,7 +255,7 @@ export class AuthController {
    *               schema:
    *                 type: object
    *                 properties:
-   *                   user:
+   *                   admin:
    *                     type: object
    *                     properties:
    *                       id:
@@ -293,8 +295,8 @@ export class AuthController {
    */
   async refreshToken(context: IRequestContext): Promise<Response> {
     try {
-      const user = await this.authService.refreshToken(context);
-      return new Response(JSON.stringify(user), {
+      const admin = await this.adminAuthService.refreshToken(context);
+      return new Response(JSON.stringify(admin), {
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (error) {

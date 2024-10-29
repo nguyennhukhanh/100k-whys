@@ -54,7 +54,7 @@ export class JwtService {
 
       return authConfig === userAuthConfig
         ? await this.sessionService.getUserSession(decoded.session)
-        : undefined; // TODO: Add admin verification
+        : await this.sessionService.getAdminSession(decoded.session);
     } catch (error) {
       throw new HttpException('Invalid token', 401);
     }
@@ -72,7 +72,7 @@ export class JwtService {
 
       return authConfig === userAuthConfig
         ? await this.sessionService.getUserSession(decoded.session)
-        : undefined; // TODO: Add admin verification
+        : await this.sessionService.getAdminSession(decoded.session);
     } catch (error) {
       throw new HttpException('Invalid token', 401);
     }

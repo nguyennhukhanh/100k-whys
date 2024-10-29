@@ -1,38 +1,41 @@
 import { HttpException, type IRequestContext } from '@thanhhoajs/thanhhoa';
 
+import type { AdminService } from '../admin/admin.service';
 import type { SessionService } from '../session/session.service';
-import type { UserService } from '../user/user.service';
 import type { CreateUserDto } from './dto/user.create';
 import type { HashService } from './hash.service';
 import type { JwtService } from './jwt.service';
 
-export class AuthService {
+export class AdminAuthService {
   constructor(
-    private readonly userService: UserService,
+    private readonly adminService: AdminService,
     private readonly hashService: HashService,
     private readonly jwtService: JwtService,
     private readonly sessionService: SessionService,
   ) {}
 
-  async register({ fullName, email, password }: CreateUserDto) {
+  async register(
+    context: IRequestContext,
+    { fullName, email, password }: CreateUserDto,
+  ) {
     try {
       const hashedPassword = await this.hashService.hash(password);
-      const user = await this.userService.createUser({
+      const admin = await this.adminService.createAdmin(context.admin, {
         fullName,
         email,
         password: hashedPassword,
       });
 
-      const sessionExist = await this.sessionService.createUserSession({
-        userId: user.id,
+      const sessionExist = await this.sessionService.createAdminSession({
+        adminId: admin.id,
       });
 
-      const tokens = await this.jwtService.signUserTokens({
+      const tokens = await this.jwtService.signAdminTokens({
         session: sessionExist.id,
       });
 
       return {
-        user,
+        admin,
         tokens,
       };
     } catch (error) {
@@ -41,31 +44,31 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const userExist = await this.userService.getUserByEmail(email);
+    const adminExist = await this.adminService.getAdminByEmail(email);
 
-    if (!userExist) {
-      throw new HttpException('User not found', 404);
+    if (!adminExist) {
+      throw new HttpException('Admin not found', 404);
     }
 
     const passwordMatch = await this.hashService.compare(
       password,
-      userExist.password as string,
+      adminExist.password as string,
     );
     if (!passwordMatch) {
       throw new HttpException('Invalid password', 401);
     }
 
-    const sessionExist = await this.sessionService.createUserSession({
-      userId: userExist.id,
+    const sessionExist = await this.sessionService.createAdminSession({
+      adminId: adminExist.id,
     });
 
-    const tokens = await this.jwtService.signUserTokens({
+    const tokens = await this.jwtService.signAdminTokens({
       session: sessionExist.id,
     });
 
     return {
-      user: {
-        ...userExist,
+      admin: {
+        ...adminExist,
         password: undefined,
       },
       tokens,
@@ -74,9 +77,9 @@ export class AuthService {
 
   async logout(context: IRequestContext): Promise<boolean> {
     try {
-      const user = context.user;
-      return await this.sessionService.deleteUserSession({
-        userId: user.id,
+      const admin = context.admin;
+      return await this.sessionService.deleteAdminSession({
+        adminId: admin.id,
       });
     } catch (error) {
       throw error;
@@ -85,17 +88,17 @@ export class AuthService {
 
   async refreshToken(context: IRequestContext) {
     try {
-      const user = context.user;
-      const sessionExist = await this.sessionService.createUserSession({
-        userId: user.id,
+      const admin = context.admin;
+      const sessionExist = await this.sessionService.createAdminSession({
+        adminId: admin.id,
       });
 
-      const tokens = await this.jwtService.signUserTokens({
+      const tokens = await this.jwtService.signAdminTokens({
         session: sessionExist.id,
       });
 
       return {
-        user,
+        admin,
         tokens,
       };
     } catch (error) {

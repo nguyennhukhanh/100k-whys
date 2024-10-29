@@ -1,7 +1,10 @@
 import { HttpException } from '@thanhhoajs/thanhhoa';
 import { eq, sql } from 'drizzle-orm';
+import { adminAuthConfig } from 'src/configs/admin-auth.config';
 import { userAuthConfig } from 'src/configs/user-auth.config';
 import { db } from 'src/database/db';
+import { adminSessions } from 'src/database/schemas/admin-sessions.schema';
+import { admins } from 'src/database/schemas/admins.schema';
 import { userSessions } from 'src/database/schemas/user-sessions.schema';
 import { users } from 'src/database/schemas/users.schema';
 import { v4 as uuidv4 } from 'uuid';
@@ -88,6 +91,91 @@ export class SessionService {
     }
 
     const result = await db.delete(userSessions).where(whereClause);
+
+    return result[0].affectedRows > 0;
+  }
+
+  async createAdminSession(options: { sessionId?: string; adminId: number }) {
+    const { sessionId, adminId } = options;
+    let adminSessionExists: any[] = [];
+
+    if (sessionId) {
+      adminSessionExists = await db
+        .select()
+        .from(adminSessions)
+        .where(eq(adminSessions.id, sessionId))
+        .limit(1);
+    } else if (adminId) {
+      adminSessionExists = await db
+        .select()
+        .from(adminSessions)
+        .where(eq(adminSessions.adminId, adminId))
+        .limit(1);
+    }
+
+    // If a session exist, delete it
+    if (adminSessionExists.length > 0) {
+      await this.deleteAdminSession({ adminId: adminSessionExists[0].adminId });
+    }
+
+    // Create a new session
+    const newSession = {
+      id: uuidv4(),
+      adminId,
+      expiresAt: new Date(
+        Date.now() + Number(adminAuthConfig.refreshTokenLifetime) * 1000,
+      ),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await db.insert(adminSessions).values(newSession);
+    return newSession;
+  }
+
+  async getAdminSession(sessionId: string) {
+    const sessionsExist = await db
+      .select({
+        id: admins.id,
+        email: admins.email,
+        fullName: admins.fullName,
+        createdAt: admins.createdAt,
+        updatedAt: admins.updatedAt,
+      })
+      .from(adminSessions)
+      .where(
+        sql`${adminSessions.id} = ${sessionId} AND ${
+          adminSessions.expiresAt
+        } > ${new Date()}`,
+      )
+      .innerJoin(admins, eq(adminSessions.adminId, admins.id))
+      .limit(1);
+
+    if (sessionsExist.length > 0) {
+      return sessionsExist[0];
+    }
+
+    throw new HttpException('Session not found', 404);
+  }
+
+  async deleteAdminSession(
+    options: Partial<{ sessionId: string; adminId: number }>,
+  ): Promise<boolean> {
+    const { sessionId, adminId } = options;
+    const whereClause = sessionId
+      ? eq(adminSessions.id, sessionId)
+      : adminId
+      ? eq(adminSessions.adminId, adminId)
+      : null;
+
+    if (!whereClause) {
+      throw new HttpException(
+        'Either id or adminId must be provided for deletion.',
+        500,
+      );
+    }
+
+    const result = await db.delete(adminSessions).where(whereClause);
 
     return result[0].affectedRows > 0;
   }

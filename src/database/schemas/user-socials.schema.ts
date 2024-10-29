@@ -14,9 +14,7 @@ export const userSocials = mysqlTable('user_socials', {
   email: varchar({ length: 100 }).notNull().unique(),
   fullName: varchar({ length: 100 }).notNull(),
   socialId: varchar({ length: 255 }).notNull(),
-  socialType: mysqlEnum('social_auth_enum', ['GOOGLE', 'FACEBOOK']).default(
-    'GOOGLE',
-  ),
+  socialType: mysqlEnum('socialType', ['GOOGLE', 'FACEBOOK']).default('GOOGLE'),
   isActive: boolean().notNull().default(true),
   userId: int()
     .notNull()
