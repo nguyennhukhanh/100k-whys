@@ -21,7 +21,7 @@ export const users = mysqlTable(
   },
   (table) => {
     return {
-      emailIndex: uniqueIndex('email_idx').on(table.email),
+      emailIndex: uniqueIndex('emailIdx').on(table.email),
     };
   },
 );

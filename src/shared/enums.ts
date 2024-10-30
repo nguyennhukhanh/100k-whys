@@ -10,18 +10,6 @@ export enum RoleEnum {
 }
 
 export enum SocialAuthEnum {
-  GOOGLE = 'google',
-  FACEBOOK = 'facebook',
-}
-
-export enum BasicAuthEnum {
-  ADMIN = 'admin',
-  USER = 'user',
-}
-
-export enum SwaggerOperationEnum {
-  PUBLIC = `Public router`,
-  SUPER_ADMIN = `Super admin's router`,
-  ADMIN = `Admin's router`,
-  USER = `User's router`,
+  GOOGLE = 'GOOGLE',
+  FACEBOOK = 'FACEBOOK',
 }
