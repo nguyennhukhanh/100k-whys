@@ -16,8 +16,12 @@ export const users = mysqlTable(
     fullName: varchar({ length: 100 }),
     password: text(),
     isActive: boolean().notNull().default(true),
-    createdAt: timestamp().notNull().defaultNow(),
-    updatedAt: timestamp().notNull().defaultNow(),
+    createdAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
   },
   (table) => {
     return {

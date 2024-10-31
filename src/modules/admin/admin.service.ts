@@ -43,8 +43,6 @@ export class AdminService {
         email: dto.email,
         fullName: dto.fullName,
         role: RoleEnum.ADMIN,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
     } catch (error) {
       throw error;

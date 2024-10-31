@@ -7,7 +7,6 @@ import { adminSessions } from 'src/database/schemas/admin-sessions.schema';
 import { admins } from 'src/database/schemas/admins.schema';
 import { userSessions } from 'src/database/schemas/user-sessions.schema';
 import { users } from 'src/database/schemas/users.schema';
-import { v4 as uuidv4 } from 'uuid';
 
 export class SessionService {
   async createUserSession(options: { sessionId?: string; userId: number }) {
@@ -35,17 +34,21 @@ export class SessionService {
 
     // Create a new session
     const newSession = {
-      id: uuidv4(),
       userId,
       expiresAt: new Date(
         Date.now() + Number(userAuthConfig.refreshTokenLifetime) * 1000,
       ),
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
-    await db.insert(userSessions).values(newSession);
-    return newSession;
+    const result = await db
+      .insert(userSessions)
+      .values(newSession)
+      .$returningId();
+
+    return {
+      id: result[0].id,
+      ...newSession,
+    };
   }
 
   async getUserSession(sessionId: string) {
@@ -120,17 +123,21 @@ export class SessionService {
 
     // Create a new session
     const newSession = {
-      id: uuidv4(),
       adminId,
       expiresAt: new Date(
         Date.now() + Number(adminAuthConfig.refreshTokenLifetime) * 1000,
       ),
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
-    await db.insert(adminSessions).values(newSession);
-    return newSession;
+    const result = await db
+      .insert(adminSessions)
+      .values(newSession)
+      .$returningId();
+
+    return {
+      id: result[0].id,
+      ...newSession,
+    };
   }
 
   async getAdminSession(sessionId: string) {

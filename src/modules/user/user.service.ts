@@ -25,8 +25,6 @@ export class UserService {
         id: newUsers[0].id,
         email: dto.email,
         fullName: dto.fullName,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
     } catch (error) {
       throw error;

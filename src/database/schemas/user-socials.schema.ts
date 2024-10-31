@@ -19,6 +19,10 @@ export const userSocials = mysqlTable('user_socials', {
   userId: int()
     .notNull()
     .references(() => users.id),
-  createdAt: timestamp().notNull().defaultNow(),
-  updatedAt: timestamp().notNull().defaultNow(),
+  createdAt: timestamp({ mode: 'date' })
+    .notNull()
+    .$default(() => new Date()),
+  updatedAt: timestamp({ mode: 'date' })
+    .notNull()
+    .$default(() => new Date()),
 });

@@ -3,6 +3,7 @@ import {
   mysqlTable,
   timestamp,
   uniqueIndex,
+  varchar,
 } from 'drizzle-orm/mysql-core';
 
 import { posts } from './posts.schema';
@@ -12,13 +13,15 @@ export const likes = mysqlTable(
   'likes',
   {
     id: int().primaryKey().autoincrement(),
-    postId: int()
+    postId: varchar({ length: 36 })
       .notNull()
       .references(() => posts.id),
     userId: int()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    createdAt: timestamp().notNull().defaultNow(),
+    createdAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
   },
   (table) => {
     return {

@@ -4,6 +4,7 @@ import {
   mysqlTable,
   text,
   timestamp,
+  varchar,
 } from 'drizzle-orm/mysql-core';
 
 import { posts } from './posts.schema';
@@ -13,15 +14,19 @@ export const comments = mysqlTable(
   'comments',
   {
     id: int().primaryKey().autoincrement(),
-    postId: int()
+    postId: varchar({ length: 36 })
       .notNull()
       .references(() => posts.id, { onDelete: 'cascade' }),
     userId: int()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     content: text().notNull(),
-    createdAt: timestamp().notNull().defaultNow(),
-    updatedAt: timestamp().notNull().defaultNow(),
+    createdAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
   },
   (table) => {
     return {

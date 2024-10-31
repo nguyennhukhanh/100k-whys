@@ -20,8 +20,12 @@ export const admins = mysqlTable(
     isActive: boolean().notNull().default(true),
     role: mysqlEnum('role', ['ADMIN', 'SUPER_ADMIN']).default('ADMIN'),
     createdBy: int('createdBy').references((): AnyMySqlColumn => admins.id),
-    createdAt: timestamp().notNull().defaultNow(),
-    updatedAt: timestamp().notNull().defaultNow(),
+    createdAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: timestamp({ mode: 'date' })
+      .notNull()
+      .$default(() => new Date()),
   },
   (table) => {
     return {
