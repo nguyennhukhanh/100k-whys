@@ -67,7 +67,7 @@ setupSwagger(app, docsRoute, swaggerSpec);
 
 app.listen({
   port: appConfig.port,
-  development: true,
+  development: false,
   staticDirectories: [
     {
       path: '/images', // example: http://host:port/images/your-image.jpeg
