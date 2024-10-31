@@ -83,7 +83,7 @@ export class UserAuthController {
   async register(context: IRequestContext): Promise<Response> {
     try {
       const { email, password, fullName } = await context.request.json();
-      const dto = new CreateUserDto(email, fullName, password);
+      const dto = new CreateUserDto({ email, fullName, password });
 
       const user = await this.userAuthService.register(dto);
 
@@ -172,7 +172,7 @@ export class UserAuthController {
   async login(context: IRequestContext): Promise<Response> {
     try {
       const { email, password } = await context.request.json();
-      new ValidateUserDto(email, password);
+      new ValidateUserDto({ email, password });
 
       const user = await this.userAuthService.login(email, password);
 

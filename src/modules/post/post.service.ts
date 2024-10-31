@@ -4,8 +4,8 @@ import type { MySqlSelect } from 'drizzle-orm/mysql-core';
 import { db } from 'src/database/db';
 import { posts } from 'src/database/schemas/posts.schema';
 import { SortEnum } from 'src/shared/enums';
+import { uploadFile } from 'src/utils/file-upload-local';
 import { paginate, type PaginatedResult } from 'src/utils/paginate';
-import { v4 as uuidv4 } from 'uuid';
 
 import { admins } from './../../database/schemas/admins.schema';
 import type { PostCreate } from './dto/post.create';
@@ -22,7 +22,7 @@ export class PostService {
         id: posts.id,
         title: posts.title,
         content: posts.content,
-        image: posts.image,
+        mediaUrl: posts.mediaUrl,
         author: {
           id: sql`${admins.id} as authorId`,
           fullName: admins.fullName,
@@ -62,19 +62,17 @@ export class PostService {
     return await paginate(db, queryBuilder, page, limit);
   }
 
-  async createPost(author: { id: number }, dto: PostCreate, file: File) {
-    const { title, content } = dto;
-    const [oldName, ext] = file.name.split('.');
-    const newFileName = `${oldName}-${uuidv4()}.${ext}`;
-    const filePath = `/images/${newFileName}`;
-    await Bun.write(`public${filePath}`, file);
+  async createPost(author: { id: number }, dto: PostCreate) {
+    const { title, content, file } = dto;
+
+    const filePath = await uploadFile(file, 'images');
 
     const newPost = await db
       .insert(posts)
       .values({
         title,
         content,
-        image: filePath,
+        mediaUrl: filePath,
         authorId: author.id,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -84,7 +82,7 @@ export class PostService {
       id: newPost[0].id,
       title,
       content,
-      image: filePath,
+      mediaUrl: filePath,
     };
   }
 }

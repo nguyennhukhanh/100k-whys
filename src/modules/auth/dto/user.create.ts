@@ -11,10 +11,10 @@ export class CreateUserDto {
   password: string;
   fullName: string;
 
-  constructor(email: string, fullName: string, password: string) {
-    this.email = email;
-    this.fullName = fullName;
-    this.password = password;
+  constructor(params: { email: string; fullName: string; password: string }) {
+    this.email = params.email;
+    this.fullName = params.fullName;
+    this.password = params.password;
     this.validate();
   }
 

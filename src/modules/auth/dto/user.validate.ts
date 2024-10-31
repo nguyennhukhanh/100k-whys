@@ -9,9 +9,9 @@ export class ValidateUserDto {
   email: string;
   password: string;
 
-  constructor(email: string, password: string) {
-    this.email = email;
-    this.password = password;
+  constructor(params: { email: string; password: string }) {
+    this.email = params.email;
+    this.password = params.password;
     this.validate();
   }
 

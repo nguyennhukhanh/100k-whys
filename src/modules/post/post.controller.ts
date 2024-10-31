@@ -1,4 +1,4 @@
-import { HttpException, type IRequestContext } from '@thanhhoajs/thanhhoa';
+import { type IRequestContext } from '@thanhhoajs/thanhhoa';
 
 import { PostCreate } from './dto/post.create';
 import { PostQuery } from './dto/post.query';
@@ -90,7 +90,7 @@ export class PostController {
    *                 type: string
    *               content:
    *                 type: string
-   *               image:
+   *               file:
    *                 type: string
    *                 format: binary
    *     responses:
@@ -107,23 +107,16 @@ export class PostController {
 
       const title = input.get('title') as string;
       const content = input.get('content') as string;
-      const image = input.get('image') as File;
-      if (!image) {
-        throw new HttpException('Image is required', 400);
-      }
+      const file = input.get('file') as File;
 
-      const dto = new PostCreate({ title, content });
+      const dto = new PostCreate({ title, content, file });
 
-      const result = await this.postService.createPost(
-        context.admin,
-        dto,
-        image,
-      );
+      const result = await this.postService.createPost(context.admin, dto);
       return new Response(JSON.stringify(result), {
         headers: { 'Content-Type': 'application/json' },
       });
-    } catch (error: Error | any) {
-      throw new HttpException(error.message, 400, error.stack);
+    } catch (error) {
+      throw error;
     }
   }
 }

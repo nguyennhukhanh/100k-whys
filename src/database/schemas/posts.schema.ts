@@ -15,7 +15,7 @@ export const posts = mysqlTable(
     id: int().primaryKey().autoincrement(),
     title: varchar({ length: 255 }).notNull(),
     content: text().notNull(),
-    image: varchar({ length: 255 }).notNull(),
+    mediaUrl: varchar({ length: 255 }).notNull(),
     authorId: int()
       .notNull()
       .references(() => admins.id, { onDelete: 'cascade' }),
