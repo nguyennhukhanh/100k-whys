@@ -13,7 +13,7 @@ export class UserAuthController {
    *   /api/user/auth/register:
    *     post:
    *       tags:
-   *         - auth
+   *         - auth/user
    *       summary: Register
    *       description: Register
    *       requestBody:
@@ -101,7 +101,7 @@ export class UserAuthController {
    *   /api/user/auth/login:
    *     post:
    *       tags:
-   *         - auth
+   *         - auth/user
    *       summary: Login
    *       description: Login
    *       requestBody:
@@ -192,7 +192,7 @@ export class UserAuthController {
    *       security:
    *         - bearerAuth: []
    *       tags:
-   *         - auth
+   *         - auth/user
    *       summary: Logout
    *       description: Logout
    *       responses:
@@ -242,7 +242,7 @@ export class UserAuthController {
    *       security:
    *         - bearerAuth: []
    *       tags:
-   *         - auth
+   *         - auth/user
    *       summary: Refresh token
    *       description: Refresh token
    *       responses:

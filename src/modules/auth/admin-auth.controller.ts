@@ -13,7 +13,7 @@ export class AdminAuthController {
    *   /api/admin/auth/register:
    *     post:
    *       tags:
-   *         - auth
+   *         - auth/admin
    *       security:
    *         - bearerAuth: []
    *       summary: Register
@@ -103,7 +103,7 @@ export class AdminAuthController {
    *   /api/admin/auth/login:
    *     post:
    *       tags:
-   *         - auth
+   *         - auth/admin
    *       summary: Login
    *       description: Login
    *       requestBody:
@@ -194,7 +194,7 @@ export class AdminAuthController {
    *       security:
    *         - bearerAuth: []
    *       tags:
-   *         - auth
+   *         - auth/admin
    *       summary: Logout
    *       description: Logout
    *       responses:
@@ -244,7 +244,7 @@ export class AdminAuthController {
    *       security:
    *         - bearerAuth: []
    *       tags:
-   *         - auth
+   *         - auth/admin
    *       summary: Refresh token
    *       description: Refresh token
    *       responses:
