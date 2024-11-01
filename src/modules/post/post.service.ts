@@ -6,14 +6,17 @@ import {
   desc,
   eq,
   gte,
+  inArray,
   isNull,
   like,
   lte,
   or,
   sql,
 } from 'drizzle-orm';
-import type { MySqlSelect } from 'drizzle-orm/mysql-core';
+import { type MySqlSelect } from 'drizzle-orm/mysql-core';
 import { db } from 'src/database/db';
+import { categories } from 'src/database/schemas/categories.schema';
+import { postCategories } from 'src/database/schemas/post-categories.schema';
 import { posts } from 'src/database/schemas/posts.schema';
 import { SortEnum } from 'src/shared/enums';
 import { deleteFile, uploadFile } from 'src/utils/file-local';
@@ -73,8 +76,8 @@ export class PostService {
       );
     }
     if (authorId) filters.push(eq(posts.authorId, authorId));
-    if (fromDate) filters.push(gte(posts.createdAt, fromDate));
-    if (toDate) filters.push(lte(posts.createdAt, toDate));
+    if (fromDate) filters.push(gte(posts.publishedAt, fromDate));
+    if (toDate) filters.push(lte(posts.publishedAt, toDate));
 
     if (filters.length > 0) {
       queryBuilder.where(and(...filters));
@@ -82,8 +85,14 @@ export class PostService {
 
     if (sort) {
       (queryBuilder as unknown as MySqlSelect).orderBy(
-        sort === SortEnum.ASC ? asc(posts.createdAt) : desc(posts.createdAt),
+        sort === SortEnum.ASC
+          ? asc(posts.publishedAt)
+          : desc(posts.publishedAt),
       );
+    } else {
+      {
+        (queryBuilder as unknown as MySqlSelect).orderBy(sql`RAND()`);
+      }
     }
 
     result = await paginate(db, queryBuilder, page, limit);
@@ -126,24 +135,44 @@ export class PostService {
   }
 
   async createPost(author: { id: number }, dto: PostCreate) {
-    const { title, content, file } = dto;
+    const { title, content, categoryIds, publishedAt, file } = dto;
 
-    const filePath = await uploadFile(file, 'images');
+    const [filePath, categoriesExist] = await Promise.all([
+      uploadFile(file, 'images'),
+      db
+        .select({ id: categories.id })
+        .from(categories)
+        .where(inArray(categories.id, categoryIds)),
+    ]);
 
-    const newPost = await db
+    if (categoriesExist.length < categoryIds.length) {
+      throw new HttpException('Category not found', 404);
+    }
+
+    const newPostId = await db
       .insert(posts)
       .values({
         title,
         content,
         mediaUrl: filePath,
+        publishedAt: publishedAt || new Date(),
         authorId: author.id,
       })
       .$returningId();
+
+    await db.insert(postCategories).values(
+      categoryIds.map((categoryId) => ({
+        postId: newPostId[0].id,
+        categoryId,
+      })),
+    );
+
     return {
-      id: newPost[0].id,
+      id: newPostId[0].id,
       title,
       content,
       mediaUrl: filePath,
+      publishedAt,
     };
   }
 
@@ -152,37 +181,53 @@ export class PostService {
     id: string,
     dto: PostUpdate,
   ): Promise<boolean> {
-    const { title, content, file } = dto;
+    const { title, content, categoryIds, publishedAt, file } = dto;
 
     const [postExist] = await db
       .select({ id: posts.id, mediaUrl: posts.mediaUrl })
       .from(posts)
       .where(and(eq(posts.id, id), eq(posts.authorId, author.id)))
       .limit(1);
+
     if (!postExist) {
       throw new HttpException('Post not found', 404);
     }
 
-    let isUpdated = false;
-
+    const updates = { title, content, publishedAt } as any;
+    let filePath;
     if (file) {
-      const filePath = await uploadFile(file, 'images');
-      const result = await db
-        .update(posts)
-        .set({ title, content, mediaUrl: filePath })
-        .where(eq(posts.id, id));
-
-      isUpdated = result[0].affectedRows > 0;
-    } else {
-      const result = await db
-        .update(posts)
-        .set({ title, content })
-        .where(eq(posts.id, id));
-
-      isUpdated = result[0].affectedRows > 0;
+      filePath = await uploadFile(file, 'images');
+      updates.mediaUrl = filePath;
     }
 
-    if (isUpdated) deleteFile(postExist.mediaUrl);
+    const result = await db.update(posts).set(updates).where(eq(posts.id, id));
+
+    const isUpdated = result[0].affectedRows > 0;
+
+    if (isUpdated && categoryIds) {
+      const categoriesExist = await db
+        .select({ id: categories.id })
+        .from(categories)
+        .where(inArray(categories.id, categoryIds));
+
+      if (categoriesExist.length < categoryIds.length) {
+        throw new HttpException('Category not found', 404);
+      }
+
+      await db.transaction(async (trx) => {
+        await trx.delete(postCategories).where(eq(postCategories.postId, id));
+        await trx.insert(postCategories).values(
+          categoryIds.map((categoryId) => ({
+            postId: id,
+            categoryId,
+          })),
+        );
+      });
+    }
+
+    if (isUpdated && file) {
+      deleteFile(postExist.mediaUrl);
+    }
 
     return isUpdated;
   }

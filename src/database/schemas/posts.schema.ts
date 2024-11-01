@@ -22,6 +22,7 @@ export const posts = mysqlTable(
     authorId: int()
       .notNull()
       .references(() => admins.id, { onDelete: 'cascade' }),
+    publishedAt: timestamp({ mode: 'date' }).notNull(),
     createdAt: timestamp({ mode: 'date' })
       .notNull()
       .$default(() => new Date()),

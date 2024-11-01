@@ -1,4 +1,5 @@
 import { type IRequestContext } from '@thanhhoajs/thanhhoa';
+import { parseJson } from 'src/utils/json-parse';
 
 import { PostCreate } from './dto/post.create';
 import { PostQuery } from './dto/post.query';
@@ -61,7 +62,6 @@ export class PostController {
    *             schema:
    *               type: object
    */
-
   async getPostsWithPagination(context: IRequestContext): Promise<Response> {
     const dto = new PostQuery(context.query);
 
@@ -122,6 +122,10 @@ export class PostController {
    *                 type: string
    *               content:
    *                 type: string
+   *               categoryIds:
+   *                 type: string
+   *               publishedAt:
+   *                 type: string
    *               file:
    *                 type: string
    *                 format: binary
@@ -139,9 +143,20 @@ export class PostController {
 
       const title = input.get('title') as string;
       const content = input.get('content') as string;
+      const categoryIds = parseJson({
+        name: 'categoryIds',
+        value: input.get('categoryIds') as string,
+      }) as number[];
+      const publishedAt = input.get('publishedAt') as unknown as Date;
       const file = input.get('file') as File;
 
-      const dto = new PostCreate({ title, content, file });
+      const dto = new PostCreate({
+        title,
+        content,
+        categoryIds,
+        publishedAt,
+        file,
+      });
 
       const result = await this.postService.createPost(context.admin, dto);
       return new Response(JSON.stringify(result), {
@@ -179,6 +194,10 @@ export class PostController {
    *                 type: string
    *               content:
    *                 type: string
+   *               categoryIds:
+   *                 type: string
+   *               publishedAt:
+   *                 type: string
    *               file:
    *                 type: string
    *                 format: binary
@@ -197,9 +216,22 @@ export class PostController {
 
       const title = input.get('title') as string;
       const content = input.get('content') as string;
+      const categoryIds = (input.get('categoryIds') as string)
+        ? (parseJson({
+            name: 'categoryIds',
+            value: input.get('categoryIds') as string,
+          }) as number[])
+        : undefined;
+      const publishedAt = input.get('publishedAt') as unknown as Date;
       const file = input.get('file') as File;
 
-      const dto = new PostUpdate({ title, content, file });
+      const dto = new PostUpdate({
+        title,
+        content,
+        categoryIds,
+        publishedAt,
+        file,
+      });
 
       const result = await this.postService.updatePost(context.admin, id, dto);
 

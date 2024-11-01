@@ -10,6 +10,14 @@ const validator = createValidator();
 validator.field('title').optional().string().length(3, 255);
 validator.field('content').optional().string();
 validator
+  .field('categoryIds')
+  .optional()
+  .custom(
+    (value) => Array.isArray(value) && value.length > 0,
+    'CategoryIds must be an array and not empty',
+  );
+validator.field('publishedAt').optional().date('Invalid publishedAt format');
+validator
   .field('file')
   .optional()
   .custom(
@@ -24,11 +32,17 @@ validator
 export class PostUpdate {
   title?: string;
   content?: string;
+  categoryIds?: number[] = [];
+  publishedAt?: Date;
   file?: File;
 
   constructor(params: Partial<PostUpdate> = {}) {
     this.title = params?.title;
     this.content = params?.content;
+    this.categoryIds = params?.categoryIds;
+    this.publishedAt = params.publishedAt
+      ? new Date(params.publishedAt)
+      : new Date();
     this.file = params?.file;
 
     const errors = validator.validate(this);

@@ -2,6 +2,7 @@ import type { ThanhHoa } from '@thanhhoajs/thanhhoa';
 
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
+import { CategoryModule } from './category/category.module';
 import { DefaultModule } from './default/default.module';
 import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
@@ -13,5 +14,6 @@ export class AppModule {
     new AdminModule(app);
     new UserModule(app);
     new PostModule(app);
+    new CategoryModule(app);
   }
 }
