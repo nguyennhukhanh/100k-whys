@@ -5,11 +5,14 @@ import { RoleEnum } from 'src/shared/enums';
 
 import { AdminService } from '../admin/admin.service';
 import { GUARD, ROLE_GUARD } from '../services/guard.service';
-import { jwtService, sessionService } from '../services/shared.service';
+import {
+  hashService,
+  jwtService,
+  sessionService,
+} from '../services/shared.service';
 import { UserService } from '../user/user.service';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthService } from './admin-auth.service';
-import { HashService } from './hash.service';
 import { UserAuthController } from './user-auth.controller';
 import { UserAuthService } from './user-auth.service';
 
@@ -17,7 +20,6 @@ export class AuthModule {
   constructor(app: ThanhHoa) {
     const userService = new UserService();
     const adminService = new AdminService();
-    const hashService = new HashService();
     const userAuthService = new UserAuthService(
       userService,
       hashService,

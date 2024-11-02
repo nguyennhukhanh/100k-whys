@@ -4,6 +4,7 @@ import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { DefaultModule } from './default/default.module';
+import { LikeModule } from './like/like.module';
 import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
 
@@ -15,5 +16,6 @@ export class AppModule {
     new UserModule(app);
     new PostModule(app);
     new CategoryModule(app);
+    new LikeModule(app);
   }
 }

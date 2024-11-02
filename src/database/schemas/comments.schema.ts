@@ -1,4 +1,5 @@
 import {
+  type AnyMySqlColumn,
   index,
   int,
   mysqlTable,
@@ -20,6 +21,9 @@ export const comments = mysqlTable(
     userId: int()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    parentId: int().references((): AnyMySqlColumn => comments.id, {
+      onDelete: 'cascade',
+    }),
     content: text().notNull(),
     createdAt: timestamp({ mode: 'date' })
       .notNull()
@@ -31,6 +35,7 @@ export const comments = mysqlTable(
   (table) => {
     return {
       postUserIndex: index('postUserIdx').on(table.postId, table.userId),
+      parentIndex: index('parentIdx').on(table.parentId),
     };
   },
 );

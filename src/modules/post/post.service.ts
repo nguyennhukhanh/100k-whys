@@ -117,6 +117,7 @@ export class PostService {
           id: sql`${admins.id} as authorId`,
           fullName: admins.fullName,
         },
+        publishedAt: posts.publishedAt,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
       })

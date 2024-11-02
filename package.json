@@ -10,6 +10,7 @@
     "test": "bun test",
     "dev": "bun --watch src/main.ts",
     "prod": "bun src/main.ts",
+    "cluster": "bun src/cluster.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "format": "prettier --write \"src/**/*.ts\"",

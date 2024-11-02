@@ -24,4 +24,4 @@ USER thanhhoajs
 COPY --from=base /app /app
 EXPOSE 1234
 ENV PORT=1234
-CMD ["bun", "prod"]
+CMD ["bun", "cluster"]
