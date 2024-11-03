@@ -63,12 +63,16 @@ export class PostController {
    *               type: object
    */
   async getPostsWithPagination(context: IRequestContext): Promise<Response> {
-    const dto = new PostQuery(context.query);
+    try {
+      const dto = new PostQuery(context.query);
 
-    const result = await this.postService.getPostsWithPagination(dto);
-    return new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+      const result = await this.postService.getPostsWithPagination(dto);
+      return new Response(JSON.stringify(result), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
@@ -94,12 +98,16 @@ export class PostController {
    *               type: object
    */
   async getPostById(context: IRequestContext): Promise<Response> {
-    const id = context.params.id as string;
-    const result = await this.postService.getPostById(id);
+    try {
+      const id = context.params.id as string;
+      const result = await this.postService.getPostById(id);
 
-    return new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+      return new Response(JSON.stringify(result), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**

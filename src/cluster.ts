@@ -6,9 +6,11 @@ import cluster from 'cluster';
 import { startServer } from './main';
 
 const logger = Logger.get('Cluster');
+const numCPUs = cpus().length / 2;
+logger.verbose(`Number of CPUs: ${numCPUs}`);
 
 if (cluster.isPrimary) {
-  for (let i = 0; i < cpus().length; i++) {
+  for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
 
